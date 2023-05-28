@@ -6,16 +6,22 @@ const validator = require('validator')
 
 exports.addToDatabase = async (req, res) => {
     try {
-        const { name, senderEmail, recevierEmail, giftName, giftLink, giftImage } = req.body;
+        const { SenderName, SenderEmail, RecipientEmail, Gift, Link, ImageLink } = req.body;
 
-
-        if (!senderEmail || !recevierEmail || !giftName || !giftLink || !giftImage) {
+        console.log(SenderName);
+        if (!SenderName ||!SenderEmail || !RecipientEmail || !Gift || !Link || !ImageLink) {
            return res.status(400).json("All field are required")
         }
-        if (!validator.isEmail(recevierEmail)) {
+        if (!validator.isEmail(RecipientEmail)) {
            return  res.status(400).json("Email should be valid")
         }
       
+        const name = SenderName;
+        const senderEmail = SenderEmail;
+        const recevierEmail = RecipientEmail;
+        const giftName = Gift;
+        const giftLink = Link;
+        const giftImage = ImageLink;
 
        let User = new user2({name, senderEmail,recevierEmail,giftName,giftLink,giftImage })
 
@@ -28,6 +34,7 @@ exports.addToDatabase = async (req, res) => {
 
 
     } catch (error) {
+        console.log(error);
         res.status(500).json(error)
     }
 
