@@ -10,27 +10,21 @@ const { link } = require("fs");
 
 
 exports.BuyGift = CatchAsyncError(async (req, res, next) => {
-    // const user = await User.findById(req.user._id);
-    // const {email,link,Amount,Name} = req.body;
+    const user = await User.findById(req.user._id);
+    const {email,link,Amount,Name} = req.body;
 
-
-
-    // if (user.role == "admin") {
-    //     return next(new ErrorHandler("admin cannot buy", 400))
-    // }
-    console.log("ih")
 
     const PaymentsDetails = await instance.orders.create({
-        amount: Number(req.body.amount * 100),
+        amount: Number(Amount * 100),
         currency: "INR",
     });
     let gift = await User.findOne({ order_id:PaymentsDetails._id });
       
    gift =   await giftModel.create({
-        // sender:req.user._id,
-        Recevier:"gamokn@rknec.edu",
-        giftName:"trial gift",
-        Link:"https://instagram.com",
+        sender:req.user._id,
+        Recevier:email,
+        giftName:Name,
+        Link:link,
         order_id:PaymentsDetails.id
 
     })
