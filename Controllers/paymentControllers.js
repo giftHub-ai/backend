@@ -8,6 +8,7 @@ const giftModel = require("../Model/giftModel")
 const { instance } = require("../index");
 const { link } = require("fs");
 
+const sendEmail = require("../utils/EmailSend")
 
 exports.BuyGift = CatchAsyncError(async (req, res, next) => {
     const user = await User.findById(req.user._id);
@@ -20,7 +21,7 @@ exports.BuyGift = CatchAsyncError(async (req, res, next) => {
     });
     let gift = await User.findOne({ order_id:PaymentsDetails._id });
       
-   gift =   await giftModel.create({
+   gift =  await giftModel.create({
         sender:req.user._id,
         Recevier:email,
         giftName:Name,
@@ -42,6 +43,7 @@ exports.BuyGift = CatchAsyncError(async (req, res, next) => {
 exports.paymentVerification = CatchAsyncError(async (req, res, next) => {
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature } =
         req.body;
+    const user = await User.findById(req.user._id);
 
         console.log(req.body)
     const body = razorpay_order_id + "|" + razorpay_payment_id;
@@ -66,6 +68,9 @@ exports.paymentVerification = CatchAsyncError(async (req, res, next) => {
         gift.Status = "ordered"
         gift.Payments = a._id
         await gift.save();
+
+        sendEmail(gift.Recevier,user.name);
+        ReceveEmail(user.gift,gift.Recevier);
 
         res.redirect(
             `http://localhost:3000/paymentsuccess?reference=${razorpay_payment_id}`

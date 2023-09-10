@@ -32,6 +32,7 @@ const GiftSchema = new mongoose.Schema({
     order_id:{
         type:String
     }
+    
 },
     {
         timestamps: true
