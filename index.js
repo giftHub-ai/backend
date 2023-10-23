@@ -19,7 +19,7 @@ exports.instance = new razorpay({
 
 
 app.use(cors({
-    origin: "http://localhost:3000",
+    origin: '*',
     credentials: true,
     methods: ["GET", "PUT", "POST", "DELETE"]
 }))
