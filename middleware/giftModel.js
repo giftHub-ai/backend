@@ -25,10 +25,7 @@ const GiftSchema = new mongoose.Schema({
         type: String,
         default: null
     },
-    Link:{
-        type:String,
-        default:null
-    },
+   
     Payments:{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'payments',

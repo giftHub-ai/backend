@@ -4,14 +4,18 @@ const ErrorHandler = require("../utils/Errorhandler");
 const { CatchAsyncError } = require("../middleware/CatchAsyncError");
 
 exports.isAuthenticated = CatchAsyncError(async (req, res, next) => {
-    const authHeader = req.headers['authorization'];
+    const authHeader = req.headers['authorization']; 
+    console.log(authHeader);
+    
+    let token= null;
     if (!authHeader) {
         return next(new ErrorHandler("not logged in"), 401)
     }
     if (authHeader) {
-        const token = authHeader.split(' ')[1];
+       token = authHeader.split(' ')[1];
+        console.log(token);
         req.token = token;
-
+        
     }
     
 

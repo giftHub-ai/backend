@@ -2,7 +2,7 @@ const { CatchAsyncError } = require("../middleware/CatchAsyncError");
 const ErrorHandler = require("../utils/Errorhandler");
 const User = require("../Model/userModel");
 const Payment = require("../Model/paymentModel")
-const giftModel = require("../Model/giftModel")
+const giftModel = require("../middleware/giftModel")
 const { instance } = require("../index");
 const { link } = require("fs");
 
@@ -54,7 +54,7 @@ exports.Mygift = CatchAsyncError(async(req,res,next)=>{
 
 exports.giftStatus = CatchAsyncError(async (req, res, next) => {
             const _id = req.params.id;
-            const {stauts} = req.body;
+            const {status} = req.body;
 
     try {
         const gifts = await giftModel.find({ _id:_id });
@@ -62,9 +62,9 @@ exports.giftStatus = CatchAsyncError(async (req, res, next) => {
         if (!gifts) {
             return next(new ErrorHandler("No gift Found", 400))
         }
-        giftModel.status = stauts;
+        giftModel.status = status;
         await gifts.save();
-        res.Status(200).json({
+        res.status(200).json({
             gifts
         })
     } catch (error) {
