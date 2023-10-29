@@ -1,3 +1,6 @@
+const nodemailer = require('nodemailer');
+const hbs = require('nodemailer-express-handlebars');
+
 exports.sendMail = (t,Name) => {
     var transporter = nodemailer.createTransport({
         service: 'gmail',

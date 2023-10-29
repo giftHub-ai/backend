@@ -11,20 +11,22 @@ const { link } = require("fs");
 const sendEmail = require("../utils/EmailSend")
 
 exports.BuyGift = CatchAsyncError(async (req, res, next) => {
-    const user = await User.findById(req.user._id);
-    const {email,link,Amount,Name} = req.body;
+    // const user = await User.findById(req.user._id);
+    const {email,link,Amount,Name,ImageLink,giftName} = req.body;
 
 
     const PaymentsDetails = await instance.orders.create({
-        amount: Number(Amount * 100),
+        amount: Number(Amount),
         currency: "INR",
     });
     let gift = await User.findOne({ order_id:PaymentsDetails._id });
       
    gift =  await giftModel.create({
-        sender:req.user._id,
+
+        Sender:req.user._id,
         Recevier:email,
-        giftName:Name,
+        giftName:giftName,
+        ImageLink:ImageLink,
         Link:link,
         order_id:PaymentsDetails.id
 
@@ -43,7 +45,7 @@ exports.BuyGift = CatchAsyncError(async (req, res, next) => {
 exports.paymentVerification = CatchAsyncError(async (req, res, next) => {
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature } =
         req.body;
-    const user = await User.findById(req.user._id);
+     const user = await User.findById(req.user._id);
 
         console.log(req.body)
     const body = razorpay_order_id + "|" + razorpay_payment_id;
@@ -69,8 +71,8 @@ exports.paymentVerification = CatchAsyncError(async (req, res, next) => {
         gift.Payments = a._id
         await gift.save();
 
-        sendEmail(gift.Recevier,user.name);
-        ReceveEmail(user.gift,gift.Recevier);
+         sendEmail(gift.Recevier,user.name);
+         ReceveEmail(user.gift,gift.Recevier);
 
         res.redirect(
             `http://localhost:3000/paymentsuccess?reference=${razorpay_payment_id}`
@@ -97,7 +99,11 @@ exports.refund = CatchAsyncError(async (req, res, next) => {
 
             let gift = await giftModel.findOne({ Payments:payment._id});
             await payment.remove();
-            await gift.remove();
+
+            gift.status = 'Returned';
+            await gift.save();
+
+            // await gift.remove();
 
             res.status(200).json({
                 sucess: true,

@@ -2,8 +2,35 @@ const ErrorHandler = require("../utils/Errorhandler");
 const User = require("../Model/userModel");
 const { CatchAsyncError } = require("../middleware/CatchAsyncError");
 const { sendToken } = require("../utils/SendToken");
+const mongoose = require("mongoose")
+const { MongoClient } = require('mongodb');
 
+exports.Product = CatchAsyncError(async(req,res,next)=>{
+    const client = new MongoClient(process.env.MONGO_URL,{ useNewUrlParser: true, useUnifiedTopology: true });
+    const {Gift} = req.body;
+    try {
+        await client.connect();
+        console.log('Connected to the database');
 
+        const db = client.db('flask_db');
+
+        // Access the collection
+        const collection = db.collection('Database');
+
+        // Perform operations on the collection
+        const documents = await collection.find({});
+        console.log(documents)
+        res.json({
+            documents
+        })
+
+    } catch (error) {
+        console.error('Error connecting to the database:', error);
+    } finally {
+        await client.close();
+    }
+
+})
 
 exports.register = CatchAsyncError(async (req, res, next) => {
     const { name, email, password } = req.body;
