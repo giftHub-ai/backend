@@ -8,7 +8,8 @@ const jwt = require("jsonwebtoken");
 const { instance } = require("../index");
 const { link } = require("fs");
 
-const {sendMail,ReceveEmail} = require("../utils/EmailSend")
+
+const {sendMail,ReceveEmail, ReturnedEmail} = require("../utils/EmailSend")
 
 exports.BuyGift = CatchAsyncError(async (req, res, next) => {
    const user = await User.findById(req.user._id);
@@ -22,7 +23,7 @@ exports.BuyGift = CatchAsyncError(async (req, res, next) => {
     let gift = await User.findOne({ order_id:PaymentsDetails._id });
       
    gift =  await giftModel.create({
-
+    senderName:req.user.name,
         Sender:req.user._id,
         Recevier:email,
         giftName:giftName,
@@ -75,7 +76,7 @@ exports.paymentVerification = CatchAsyncError(async (req, res, next) => {
         await gift.save();
 
         sendMail(gift.Recevier,uuser.name);
-         ReceveEmail(uuser.email,"kartik");
+         ReceveEmail(uuser.email,gift.Recevier);
 
         res.redirect(
             `http://127.0.0.1:5173/dashboard`
@@ -87,24 +88,29 @@ exports.paymentVerification = CatchAsyncError(async (req, res, next) => {
     }
 });
 exports.refund = CatchAsyncError(async (req, res, next) => {
-        const orderID = req.body.order_id;
-
+        const orderID = req.params.id;
         try {
             let payment = await Payment.findOne({ razorpay_order_id : orderID})
             const gap = Date.now() - payment.createdAt;
 
             const refundTime = 5 * 24 * 60 * 60 * 1000;
+            
 
-            if (refundTime > gap) {
-                await razorpay.payments.refund(orderID);
-                return true;
+            if (refundTime < gap) {
+                return next(new ErrorHandler("No refund can be done", 400))
+                
+                
             }
-
+            await razorpay.payments.refund(orderID);
             let gift = await giftModel.findOne({ Payments:payment._id});
-            await payment.remove();
+
+            // await payment.remove();
 
             gift.status = 'Returned';
             await gift.save();
+            let user = await User.findById({_id:gift.sender})
+            ReturnedEmail(user.email, req.user.name)
+
 
             // await gift.remove();
 
