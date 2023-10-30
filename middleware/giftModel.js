@@ -18,12 +18,14 @@ const GiftSchema = new mongoose.Schema({
     },
     Status:{
         type:String,
-        enum: ["Delivered","Returned","Pending","ordered"],
+        enum: ["Seen","Rejected","Pending","ordered","Accepted"],
         default: "Pending",
     },
-    Link:{
-        type:String
+    ImageLink: {
+        type: String,
+        default: null
     },
+   
     Payments:{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'payments',

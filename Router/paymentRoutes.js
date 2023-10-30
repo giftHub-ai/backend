@@ -5,9 +5,9 @@ const { isAuthenticated } = require("../middleware/auth")
 
 
 
-router.route("/buyGift").post(BuyGift);
-router.route("/paymentverification").post(paymentVerification);
-router.route("/refund").post(refund);
+router.route("/buyGift").post(isAuthenticated,BuyGift);
+router.route("/paymentverification/:token").post(paymentVerification);
+router.route("/refund").post(isAuthenticated,refund);
 
 
 module.exports = router;

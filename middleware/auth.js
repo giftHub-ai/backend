@@ -4,12 +4,20 @@ const ErrorHandler = require("../utils/Errorhandler");
 const { CatchAsyncError } = require("../middleware/CatchAsyncError");
 
 exports.isAuthenticated = CatchAsyncError(async (req, res, next) => {
-
-    const { token } = req.cookies;
-    console.log(token)
-    if (!token) {
+    const authHeader = req.headers['authorization']; 
+    console.log(authHeader);
+    
+    let token= null;
+    if (!authHeader) {
         return next(new ErrorHandler("not logged in"), 401)
     }
+    if (authHeader) {
+       token = authHeader.split(' ')[1];
+        console.log(token);
+        req.token = token;
+        
+    }
+    
 
     const decoded = await jwt.verify(token, process.env.JWTSECRET);
 

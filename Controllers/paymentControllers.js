@@ -3,29 +3,30 @@ const ErrorHandler = require("../utils/Errorhandler");
 const User = require("../Model/userModel");
 const crypto = require("crypto")
 const Payment = require("../Model/paymentModel")
-const giftModel = require("../Model/giftModel")
-
+const giftModel = require("../middleware/giftModel")
+const jwt = require("jsonwebtoken");
 const { instance } = require("../index");
 const { link } = require("fs");
 
-const sendEmail = require("../utils/EmailSend")
+const {sendMail,ReceveEmail} = require("../utils/EmailSend")
 
 exports.BuyGift = CatchAsyncError(async (req, res, next) => {
-    // const user = await User.findById(req.user._id);
-    const {email,link,Amount,Name} = req.body;
+   const user = await User.findById(req.user._id);
+    const {email,Amount,ImageLink,giftName} = req.body;
 
 
     const PaymentsDetails = await instance.orders.create({
-        amount: Number(Amount * 100),
+        amount: Number(Amount),
         currency: "INR",
     });
     let gift = await User.findOne({ order_id:PaymentsDetails._id });
       
    gift =  await giftModel.create({
-        
+
+        Sender:req.user._id,
         Recevier:email,
-        giftName:Name,
-        Link:link,
+        giftName:giftName,
+        ImageLink:ImageLink,
         order_id:PaymentsDetails.id
 
     })
@@ -43,9 +44,13 @@ exports.BuyGift = CatchAsyncError(async (req, res, next) => {
 exports.paymentVerification = CatchAsyncError(async (req, res, next) => {
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature } =
         req.body;
-    // const user = await User.findById(req.user._id);
+    const token = req.params.token;          
+    const decoded = await jwt.verify(token, process.env.JWTSECRET);
+    const user = await User.findById(decoded._id);
 
-        console.log(req.body)
+    const  uuser = await User.findById(user._id);
+
+        // console.log(req.body)
     const body = razorpay_order_id + "|" + razorpay_payment_id;
 
     const expectedSignature = crypto
@@ -69,11 +74,11 @@ exports.paymentVerification = CatchAsyncError(async (req, res, next) => {
         gift.Payments = a._id
         await gift.save();
 
-        // sendEmail(gift.Recevier,user.name);
-        // ReceveEmail(user.gift,gift.Recevier);
+        sendMail(gift.Recevier,uuser.name);
+         ReceveEmail(uuser.email,"kartik");
 
         res.redirect(
-            `http://localhost:3000/paymentsuccess?reference=${razorpay_payment_id}`
+            `http://127.0.0.1:5173/dashboard`
         );
     } else {
         res.status(400).json({
@@ -97,7 +102,11 @@ exports.refund = CatchAsyncError(async (req, res, next) => {
 
             let gift = await giftModel.findOne({ Payments:payment._id});
             await payment.remove();
-            await gift.remove();
+
+            gift.status = 'Returned';
+            await gift.save();
+
+            // await gift.remove();
 
             res.status(200).json({
                 sucess: true,

@@ -1,3 +1,13 @@
+const express = require('express')
+const app = express();
+const nodemailer = require('nodemailer');
+const path = require('path');
+const hbs = require('nodemailer-express-handlebars');
+const viewPath = path.resolve(__dirname, './templates/views/');
+app.use(express.static(path.join(__dirname, './public')))
+app.set("view engine", "ejs");
+app.set("views", path.resolve(__dirname, "./templates/views/"))
+
 exports.sendMail = (t,Name) => {
     var transporter = nodemailer.createTransport({
         service: 'gmail',
