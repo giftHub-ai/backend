@@ -6,7 +6,7 @@ const giftModel = require("../middleware/giftModel")
 const { instance } = require("../index");
 const { link } = require("fs");
 
-const sendEmail = require("../utils/EmailSend")
+const {AcceptedEmail,ReturnedEmail}= require("../utils/EmailSend")
 
 exports.getGift = CatchAsyncError( async (req,res,next)=>{
     try {
@@ -36,7 +36,7 @@ exports.getGift = CatchAsyncError( async (req,res,next)=>{
 
 exports.Mygift = CatchAsyncError(async(req,res,next)=>{
     try {
-    const gifts = await giftModel.find({ Sender :req.user._id});
+    const gifts = await giftModel.find({Sender:req.user._id});
 
     if (!gifts) {
         return next(new ErrorHandler("No gift sent", 400))
@@ -54,7 +54,7 @@ exports.Mygift = CatchAsyncError(async(req,res,next)=>{
 
 exports.giftStatus = CatchAsyncError(async (req, res, next) => {
             const _id = req.params.id;
-            const {status} = req.body;
+           
 
     try {
         const gifts = await giftModel.find({ _id:_id });
@@ -62,15 +62,46 @@ exports.giftStatus = CatchAsyncError(async (req, res, next) => {
         if (!gifts) {
             return next(new ErrorHandler("No gift Found", 400))
         }
-        giftModel.status = status;
+        
+        giftModel.Status = "Accepted";
         await gifts.save();
+        const a = await User.findById({_id:gifts.Sender})
+
+        AcceptedEmail(a.email,req.user.name);
+
         res.status(200).json({
-            gifts
+            sucess:true
         })
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 
+
+
+})
+
+exports.getReturnedGift = CatchAsyncError(async (req, res, next) => {
+    try {
+        const user = await User.findById(req.user._id);
+        const gifts = await giftModel.find({
+            $and: [
+                { Sender: user._id },
+                { Status: "Returned" }
+            ]
+        })
+
+
+        if (!gifts) {
+            return next(new ErrorHandler("No gift returned", 400))
+        }
+
+        res.Status(200).json({
+            gifts
+        })
+
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
 
 
 })

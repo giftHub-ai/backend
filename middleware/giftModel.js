@@ -5,6 +5,9 @@ const bcrypt = require("bcrypt");
 const crypto = require("crypto")
 
 const GiftSchema = new mongoose.Schema({
+    senderName:{
+        type: String
+    },
     Sender: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'user',
@@ -18,7 +21,7 @@ const GiftSchema = new mongoose.Schema({
     },
     Status:{
         type:String,
-        enum: ["Delivered","Returned","Pending","ordered","accepted"],
+        enum: ["Delivered","Returned","Pending","ordered","Accepted"],
         default: "Pending",
     },
     ImageLink: {
