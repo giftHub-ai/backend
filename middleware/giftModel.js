@@ -18,7 +18,7 @@ const GiftSchema = new mongoose.Schema({
     },
     Status:{
         type:String,
-        enum: ["Delivered","Returned","Pending","ordered","accepted"],
+        enum: ["Seen","Rejected","Pending","ordered","Accepted"],
         default: "Pending",
     },
     ImageLink: {

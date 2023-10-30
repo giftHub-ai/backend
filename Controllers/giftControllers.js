@@ -9,6 +9,7 @@ const { link } = require("fs");
 const sendEmail = require("../utils/EmailSend")
 
 exports.getGift = CatchAsyncError( async (req,res,next)=>{
+
     try {
         const user = await User.findById(req.user._id);
         const gifts = await giftModel.find({
@@ -17,15 +18,15 @@ exports.getGift = CatchAsyncError( async (req,res,next)=>{
                 { Status: "ordered" }
             ]
         })
-
-
+        
         if(!gifts){
             return next(new ErrorHandler("No gift recevied", 400))
         }
-
-        res.Status(200).json({
+        
+        res.status(200).json({
             gifts
         })
+       
         
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -34,43 +35,39 @@ exports.getGift = CatchAsyncError( async (req,res,next)=>{
 
 })
 
-exports.Mygift = CatchAsyncError(async(req,res,next)=>{
+exports.mygift = CatchAsyncError(async(req,res,next)=>{
     try {
     const gifts = await giftModel.find({ Sender :req.user._id});
 
     if (!gifts) {
         return next(new ErrorHandler("No gift sent", 400))
     }
-    res.Status(200).json({
+    res.status(200).json({
         gifts
     })
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
-
-
-
 })
 
-exports.giftStatus = CatchAsyncError(async (req, res, next) => {
+exports.giftstatus = CatchAsyncError(async (req, res, next) => {
             const _id = req.params.id;
             const {status} = req.body;
 
-    try {
+           try {
         const gifts = await giftModel.find({ _id:_id });
-
+console.log("gifts  ",gifts);
         if (!gifts) {
             return next(new ErrorHandler("No gift Found", 400))
         }
-        giftModel.status = status;
-        await gifts.save();
+        gifts[0].Status = status;
+        await gifts[0].save();
+        console.log("gifts Saved ",gifts[0]);
         res.status(200).json({
             gifts
         })
     } catch (error) {
+        console.log(error);
         res.status(500).json({ error: error.message });
     }
-
-
-
 })
