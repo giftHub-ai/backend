@@ -31,8 +31,8 @@ exports.sendMail = (t,Name) => {
     var mailOptions = {
         from: 'gamotkn@rknec.edu',
         to: t,
-        subject: 'Gift Recieve !!',
-        template: 'ReturnedEmail',
+        subject: 'Gift send!!',
+        template: 'SendEmail',
         context: {
             name: Name
         }
@@ -115,7 +115,7 @@ exports.ReturnedEmail = (t, Name) => {
         from: 'gamotkn@rknec.edu',
         to: t,
         subject: 'Gift Returned !!',
-        template: 'RecieveEmailTemplate',
+        template: 'ReturnedEmail',
         context: {
             name: Name
         }
@@ -156,7 +156,7 @@ exports.AcceptedEmail = (t, Name) => {
         from: 'gamotkn@rknec.edu',
         to: t,
         subject: 'Gift Accepted!!',
-        template: 'RecieveEmailTemplate',
+        template: 'AcceptedEmail',
         context: {
             name: Name
         }

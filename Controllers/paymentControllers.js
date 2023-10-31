@@ -70,13 +70,14 @@ exports.paymentVerification = CatchAsyncError(async (req, res, next) => {
             razorpay_signature,
         });
         console.log(a)
-        const gift = await giftModel.findOne({order_id:razorpay_order_id});
-        gift.Status = "ordered"
-        gift.Payments = a._id
-        await gift.save();
+        const gifts = await giftModel.findOne({order_id:razorpay_order_id});
+console.log(gifts);
+        gifts.Status = "ordered";
+        gifts.Payments = a._id;
+        await gifts.save();
 
-        sendMail(gift.Recevier,uuser.name);
-         ReceveEmail(uuser.email,gift.Recevier);
+        sendMail(uuser.email,gifts.senderName);
+         ReceveEmail(gifts.Recevier,uuser.name);
 
         res.redirect(
             `http://127.0.0.1:5173/dashboard`
@@ -102,11 +103,12 @@ exports.refund = CatchAsyncError(async (req, res, next) => {
                 
             }
             await razorpay.payments.refund(orderID);
-            let gift = await giftModel.findOne({ Payments:payment._id});
-
+            let gifts = await giftModel.findOne({ Payments:payment._id});
+            // const gift = gifts;
+            console.log(gifts);
             // await payment.remove();
 
-            gift.status = 'Returned';
+            gift.Status = 'Returned';
             await gift.save();
             let user = await User.findById({_id:gift.sender})
             ReturnedEmail(user.email, req.user.name)
