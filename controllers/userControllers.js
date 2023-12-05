@@ -63,19 +63,19 @@ exports.login = CatchAsyncError(async (req, res, next) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-        return next(new ErrorHandler("Please addd all field", 400))
+        return next(new ErrorHandler("Please addd all field", 500))
     }
 
     const user = await User.findOne({ email })
 
     if (!user) {
-        return next(new ErrorHandler("User Doesn't Exist", 400))
+        return next(new ErrorHandler("User Doesn't Exist", 500))
     }
 
     const isMatch = await user.matchPassword(password);
 
     if (!isMatch) {
-        return next(new ErrorHandler(" Incoreect Email or password  "))
+        return next(new ErrorHandler(" Incorect Email or password",500))
     }
 
     sendToken(res, user, "Welcome back",)

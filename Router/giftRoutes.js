@@ -6,7 +6,7 @@ const { Mygift, getGift,giftStatus,getReturnedGift}= require("../Controllers/gif
 router.route("/getgift").get(isAuthenticated,getGift)
 router.route("/Mygift").get(isAuthenticated,Mygift)
 router.route("/status/:id").post(isAuthenticated,giftStatus)
-router.route("/ReturnedGift").get(isAuthenticated,getReturnedGift)
+router.route("/returnedgift/:id").get(isAuthenticated,getReturnedGift)
 
 
 
